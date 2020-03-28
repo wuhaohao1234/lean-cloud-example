@@ -1,11 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>leanCloud</title>
+    <link rel="stylesheet" href="./dist/css/bootstrap.min.css">
+    <script src="./dist/js/av-min.js"></script>
 </head>
+
 <body>
-   todo 
+    <div id="app">
+        <div class="container">
+            <div class="input-group flex-nowrap">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">任务</span>
+                </div>
+                <input v-model="message" type="text" @keyup.enter="addTask" class="form-control" placeholder="添加代办事项">
+            </div>
+            <br>
+            <ul class="list-group">
+                <li class="list-group-item" v-for="(item,key) in taskArr" :key="key" v-text="item" ></li>
+            </ul>
+            <br>
+            <button @click="addTask" type="button" class="btn btn-primary">添加</button>
+
+            <button @click="query" type="button" class="btn btn-primary">查询</button>
+        </div>
+    </div>
+    <script src="./dist/js/vue.js"></script>
+    <script src="./src/util.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                message: '',
+                taskArr: [],
+                classTodo: null
+            },
+            created() {
+                this.classTodo = createCloud('Todo')
+                this.query()
+            },
+            methods: {
+                addTask() {
+                    if (this.message !== '') {
+                        this.taskArr.unshift(this.message)
+                        saveClient.call(this)
+                    }
+                },
+                query() {
+                    const that = this
+                    this.taskArr = []
+                    var query = new AV.Query('Todo');
+                    query.find().then(function (result) {
+                        result.map(item => {
+                            that.taskArr.unshift(item._serverData.title)
+                        })
+                    });
+                }
+            }
+        })
+
+    </script>
 </body>
+
 </html>
